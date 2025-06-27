@@ -31,6 +31,7 @@
             this.btnToCalculatorForm = new System.Windows.Forms.Button();
             this.btnSignOut = new System.Windows.Forms.Button();
             this.lblWelcome = new System.Windows.Forms.Label();
+            this.btnListVehicles = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnToCalculatorForm
@@ -67,12 +68,25 @@
             this.lblWelcome.TabIndex = 14;
             this.lblWelcome.Text = "Welcome";
             // 
+            // btnListVehicles
+            // 
+            this.btnListVehicles.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.btnListVehicles.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnListVehicles.Location = new System.Drawing.Point(600, 78);
+            this.btnListVehicles.Name = "btnListVehicles";
+            this.btnListVehicles.Size = new System.Drawing.Size(188, 41);
+            this.btnListVehicles.TabIndex = 15;
+            this.btnListVehicles.Text = "List of Vehicles";
+            this.btnListVehicles.UseVisualStyleBackColor = false;
+            this.btnListVehicles.Click += new System.EventHandler(this.btnListVehicles_Click);
+            // 
             // HomeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnListVehicles);
             this.Controls.Add(this.lblWelcome);
             this.Controls.Add(this.btnSignOut);
             this.Controls.Add(this.btnToCalculatorForm);
@@ -88,5 +102,6 @@
         private System.Windows.Forms.Button btnToCalculatorForm;
         private System.Windows.Forms.Button btnSignOut;
         private System.Windows.Forms.Label lblWelcome;
+        private System.Windows.Forms.Button btnListVehicles;
     }
 }

@@ -46,10 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CarPaymentForm.cs">
+    <Compile Include="components\CarListsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CarPaymentForm.Designer.cs">
+    <Compile Include="components\CarListsForm.Designer.cs">
+      <DependentUpon>CarListsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="components\CarPaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="components\CarPaymentForm.Designer.cs">
       <DependentUpon>CarPaymentForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HomeForm.cs">
@@ -58,27 +64,30 @@
     <Compile Include="HomeForm.Designer.cs">
       <DependentUpon>HomeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LoginForm.cs">
+    <Compile Include="Auth\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LoginForm.Designer.cs">
+    <Compile Include="Auth\LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SignUpForm.cs">
+    <Compile Include="Auth\SignUpForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SignUpForm.Designer.cs">
+    <Compile Include="Auth\SignUpForm.Designer.cs">
       <DependentUpon>SignUpForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="CarPaymentForm.resx">
+    <EmbeddedResource Include="components\CarListsForm.resx">
+      <DependentUpon>CarListsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="components\CarPaymentForm.resx">
       <DependentUpon>CarPaymentForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HomeForm.resx">
       <DependentUpon>HomeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LoginForm.resx">
+    <EmbeddedResource Include="Auth\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -90,7 +99,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="SignUpForm.resx">
+    <EmbeddedResource Include="Auth\SignUpForm.resx">
       <DependentUpon>SignUpForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
@@ -106,5 +115,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
