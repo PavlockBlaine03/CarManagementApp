@@ -14,6 +14,7 @@ namespace CarPaymentApp.components
     public partial class CarListsForm : Form
     {
         private string _username;
+        private bool _isSuccessful;
         private int _userId;
         private string connectionString = @"Server=DESKTOP-MAI0MDI\SQLEXPRESS01;Database=CarPaymentApp;Trusted_Connection=True;";
         public CarListsForm(int userId, string username)
@@ -61,6 +62,9 @@ namespace CarPaymentApp.components
                         reader["MonthlyPayment"]
                     );
                 }
+
+                int lastColumnIndex = dataGridCars.Columns.Count - 1;
+                dataGridCars.Columns[lastColumnIndex].ReadOnly = true;
             }
         }
 
@@ -79,58 +83,66 @@ namespace CarPaymentApp.components
 
                 foreach(DataGridViewRow row in dataGridCars.Rows)
                 {
-                    if(row.IsNewRow || row.Cells["Id"].Value == null)
+                    if (row.IsNewRow || row.Cells["Id"].Value == null)
+                        continue;
+
+                    try
                     {
-                        try
+
+                        int id = Convert.ToInt32(row.Cells["Id"].Value);
+                        decimal carPrice = Convert.ToDecimal(row.Cells["CarPrice"].Value);
+                        decimal downPayment = Convert.ToDecimal(row.Cells["DownPayment"].Value);
+                        decimal interestRate = Convert.ToDecimal(row.Cells["InterestRate"].Value);
+                        interestRate = Math.Round(interestRate, 2);
+                        int loanTerm = Convert.ToInt32(row.Cells["LoanTerm"].Value);
+
+                        decimal monthlyRate = interestRate / 100 / 12;
+                        decimal loanAmount = carPrice - downPayment;
+                        decimal monthlyPayment;
+
+                        if (monthlyRate == 0)
                         {
-                            int id = Convert.ToInt32(row.Cells["Id"].Value);
-                            decimal carPrice = Convert.ToDecimal(row.Cells["CarPrice"].Value);
-                            decimal downPayment = Convert.ToDecimal(row.Cells["DownPayment"].Value);
-                            decimal interestRate = Convert.ToDecimal(row.Cells["InterestRate"].Value);
-                            int loanTerm = Convert.ToInt32(row.Cells["LoanTerm"].Value);
-
-                            decimal monthlyRate = interestRate / 100 / 12;
-                            decimal loanAmount = carPrice - downPayment;
-                            decimal monthlyPayment;
-
-                            if (monthlyRate == 0)
-                            {
-                                monthlyPayment = loanAmount / loanTerm;
-                            }
-                            else
-                            {
-                                monthlyPayment = (loanAmount * monthlyRate) /
-                                    (1 - (decimal)Math.Pow(1 + (double)monthlyRate, -loanTerm));
-                            }
-
-                            row.Cells["MonthlyPayment"].Value = monthlyPayment;
-
-                            string updateQuery = @"
-                            UPDATE Transactions
-                            SET CarPrice = @carPrice,
-                                DownPayment = @downPayment,
-                                InterestRate = @interestRate,
-                                LoanTerm = @loanTerm,
-                                MonthlyPayment = @monthlyPayment
-                            WHERE Id = @id";
-
-                            SqlCommand cmd = new SqlCommand(updateQuery, conn);
-                            cmd.Parameters.AddWithValue("@carPrice", carPrice);
-                            cmd.Parameters.AddWithValue("@downPayment", downPayment);
-                            cmd.Parameters.AddWithValue("@interestRate", interestRate);
-                            cmd.Parameters.AddWithValue("@loanTerm", loanTerm);
-                            cmd.Parameters.AddWithValue("@monthlyPayment", monthlyPayment);
-                            cmd.Parameters.AddWithValue("@id", id);
-
-                            cmd.ExecuteNonQuery();
+                            monthlyPayment = loanAmount / loanTerm;
                         }
-                        catch (Exception ex) 
+                        else
                         {
-                            MessageBox.Show($"Error in row with ID {row.Cells["Id"].Value}: {ex.Message}");
+                            monthlyPayment = (loanAmount * monthlyRate) /
+                                (1 - (decimal)Math.Pow(1 + (double)monthlyRate, -loanTerm));
                         }
+
+                        monthlyPayment = Math.Round(monthlyPayment, 2);
+                        row.Cells["MonthlyPayment"].Value = monthlyPayment;
+
+                        string updateQuery = @"
+                        UPDATE Transactions
+                        SET CarPrice = @carPrice,
+                            DownPayment = @downPayment,
+                            InterestRate = @interestRate,
+                            LoanTerm = @loanTerm,
+                            MonthlyPayment = @monthlyPayment
+                        WHERE Id = @id";
+
+                        SqlCommand cmd = new SqlCommand(updateQuery, conn);
+                        cmd.Parameters.AddWithValue("@carPrice", carPrice);
+                        cmd.Parameters.AddWithValue("@downPayment", downPayment);
+                        cmd.Parameters.AddWithValue("@interestRate", interestRate);
+                        cmd.Parameters.AddWithValue("@loanTerm", loanTerm);
+                        cmd.Parameters.AddWithValue("@monthlyPayment", monthlyPayment);
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        cmd.ExecuteNonQuery();
+                        _isSuccessful = true;
+                    }
+                    catch (Exception ex) 
+                    {
+                        _isSuccessful = false;
+                        MessageBox.Show($"Error in row with ID {row.Cells["Id"].Value}: {ex.Message}");
                     }
                 }
-                MessageBox.Show("Changes saved successfully!");
+                if(_isSuccessful)
+                {
+                    MessageBox.Show("Changes saved successfully!");
+                }
             }
         }
     }

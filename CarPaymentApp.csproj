@@ -78,6 +78,7 @@
     <Compile Include="Auth\SignUpForm.Designer.cs">
       <DependentUpon>SignUpForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utility\CarInfo.cs" />
     <EmbeddedResource Include="components\CarListsForm.resx">
       <DependentUpon>CarListsForm.cs</DependentUpon>
     </EmbeddedResource>

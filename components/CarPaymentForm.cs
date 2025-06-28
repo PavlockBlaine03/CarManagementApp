@@ -5,14 +5,18 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CarPaymentApp.Utility;
 
 namespace CarPaymentApp
 {
     public partial class CarPaymentForm : Form
     {
+        private CarInfo _carInfo = new CarInfo();
+
         private int _userId;
         private string _name;
         private string connectionString = @"Server=DESKTOP-MAI0MDI\SQLEXPRESS01;Database=CarPaymentApp;Trusted_Connection=True;";
@@ -28,29 +32,22 @@ namespace CarPaymentApp
         {
             try
             { 
-                decimal carPrice = decimal.Parse(txtCarPrice.Text);
-                decimal downPayment = decimal.Parse(txtDownPayment.Text);
+                _carInfo.price = decimal.Parse(txtCarPrice.Text);
+                _carInfo.downPayment = decimal.Parse(txtDownPayment.Text);
 
-                if(carPrice < downPayment )
+                if(_carInfo.price < _carInfo.downPayment )
                 {
                     throw new Exception("Can't have a higher downpayment than price of vehicle!");
                 }
 
-                decimal interestRate = decimal.Parse(txtInterestRate.Text) / 100 / 12;
-                string loanTermString = listLoanTerm.Text;
-                if(loanTermString == null)
-                {
-                    throw new Exception("invalid loan term!");
-                }
-                string[] parts = loanTermString.Split(' ');
-                int loanTerm = int.Parse(parts[0]);
+                _carInfo.interestRate = decimal.Parse(txtInterestRate.Text) / 100 / 12;
+                _carInfo.loanTerm = CarInfo.convertLoanTerm(listLoanTerm.Text);
 
-                decimal loanAmount = carPrice - downPayment;
-                decimal monthlyPayment = (
-                        loanAmount * interestRate) / (1 - (decimal)Math.Pow(1 + (double)interestRate, -loanTerm)
-                        );
+                _carInfo.loanAmount = _carInfo.price - _carInfo.downPayment;
 
-                lblMonthlyPayment.Text = $"Monthly Payment: {monthlyPayment:C2}";
+                _carInfo.monthlyPayment = _carInfo.calculateMonthlyPayment();
+
+                lblMonthlyPayment.Text = $"Monthly Payment: {_carInfo.monthlyPayment:C2}";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
@@ -61,19 +58,19 @@ namespace CarPaymentApp
 
                     SqlCommand cmd = new SqlCommand(insertQuery, conn);
                     cmd.Parameters.AddWithValue("@userId", _userId);
-                    cmd.Parameters.AddWithValue("@price", carPrice);
-                    cmd.Parameters.AddWithValue("@down", downPayment);
-                    cmd.Parameters.AddWithValue("@rate", interestRate * 12 * 100);
-                    cmd.Parameters.AddWithValue("@term", loanTerm);
-                    cmd.Parameters.AddWithValue("@monthly", monthlyPayment);
+                    cmd.Parameters.AddWithValue("@price", _carInfo.price);
+                    cmd.Parameters.AddWithValue("@down", _carInfo.downPayment);
+                    cmd.Parameters.AddWithValue("@rate", _carInfo.interestRate * 12 * 100);
+                    cmd.Parameters.AddWithValue("@term", _carInfo.loanTerm);
+                    cmd.Parameters.AddWithValue("@monthly", _carInfo.monthlyPayment);
 
                     cmd.ExecuteNonQuery();
                     LoadTransactions();
             }
             }
-            catch (FormatException ex) 
+            catch (FormatException ex)
             {
-                MessageBox.Show("Please enter a valid numeric values: " + ex.Message);   
+                MessageBox.Show("Please enter a valid numeric values: " + ex.Message);
             }
             catch (Exception ex)
             {

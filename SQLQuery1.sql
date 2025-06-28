@@ -21,4 +21,4 @@ Create table Transactions (
 	DateCreated Datetime Default GetDate()
 );
 SELECT * FROM Transactions;
-DELETE FROM Transactions WHERE UserId = 4;
+DELETE FROM Transactions WHERE Id = 5;
